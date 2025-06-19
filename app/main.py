@@ -1,11 +1,12 @@
 from fastapi import FastAPI
-from app.routers import notes
-from app.database import init_db
 
 app = FastAPI()
 
-@app.on_event("startup")
-async def on_startup():
-    await init_db()
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
 
-app.include_router(notes.router)
+
+@app.get("/test")
+async def root_test():
+    return {"message": "Hello test"}
