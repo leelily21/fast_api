@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from schemas import UserCreate, UserOut
 from models import User
 from database import get_session
-from auth import get_password_hash, verify_password
+from auth import get_password_hash, verify_password, create_access_token  # добавили create_access_token
 
 router = APIRouter()
 
@@ -29,4 +29,7 @@ async def login(user: UserCreate, db: AsyncSession = Depends(get_session)):
     db_user = result.scalars().first()
     if not db_user or not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    return {"message": "Login successful"}
+
+    # ✅ Генерация токена
+    access_token = create_access_token(data={"sub": db_user.email})
+    return {"access_token": access_token, "token_type": "bearer"}
